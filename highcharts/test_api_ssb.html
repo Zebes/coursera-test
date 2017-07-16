@@ -1,0 +1,89 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <title>SSB API mot Statstikkbanken - ferdig datasett for arbeidsledighet</title>
+      
+      
+      <!-- 1. Add these JavaScript inclusions in the head of your page -->
+      <script type="text/javascript" src="http://json-stat.org/lib/json-stat.js"></script>
+      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script type="text/javascript" src="http://code.highcharts.com/highcharts.js"></script>
+      <script src="http://code.highcharts.com/modules/data.js"></script>
+  </head>
+
+  <body>
+  <p>SSB API mot Statstikkbanken - ferdig datasett for arbeidsledighet<br />Eksempel på JSON-stat sammen med Highcharts <br />Bruk "Vis kilde"</p>
+  <!-- Highcharts container -->
+  <div id="container" style="width: 1200px; height: 800px; margin: 0 auto"></div>
+     
+    <script type="text/javascript">
+
+      /* Adresse til json-stat datasettet */
+    url="http://data.ssb.no/api/v0/dataset/1052.json";
+    /* henter datasettet med jquery get */
+    $.get(url, function main(obj){
+      ds=JSONstat(obj).Dataset(0);
+     
+      $(document).ready(function() {
+      /* Highcharts kode */     
+          $('#container').highcharts({
+
+              chart: {
+                  type: 'line'
+              },
+              
+              title: {
+                  text: 'Arbeidsløyse siste 13 mnd. '  
+              },
+              /* henter dimensjoner i json-stat datasett. Tips: bruk F12 konsoll */
+              xAxis: [
+                  {
+                      categories: ds.Dimension("Tid").id
+                  }
+              ],
+
+              yAxis: [
+                  {
+                          title: {
+                          text: 'prosent'
+                      },
+                      opposite: true
+                  }, 
+                  {                   
+                          title: {
+                          text: 'Tusen'                       
+                      }
+                  }
+              ],
+
+              series:[
+              /* henter json-stat dataseriene */
+              {
+                  name: ds.Dimension("ContentsCode").Category("Arbeidslause4").label,
+                  yAxis: 0,
+                  type: 'spline',
+                  data: ds.Data({"ContentsCode":"Arbeidslause4"}, false),
+                  zIndex: 2,
+              },
+              {
+                  name: ds.Dimension("ContentsCode").Category("Arbeidslause2").label,
+                  yAxis: 1,
+                  type: 'column',
+                  data: ds.Data({"ContentsCode":"Arbeidslause2"}, false),
+                  zIndex: 1,
+              }
+              ],
+              });
+          }
+      /* Slutt Highcharts kode */
+      );      
+      }
+    )
+ </script>
+      
+ 
+              
+  </body>
+</html>

@@ -1,0 +1,96 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <title>SSB API mot Statstikkbanken - ferdig datasett UH</title>
+      
+      
+      <!-- 1. Add these JavaScript inclusions in the head of your page -->
+      <script type="text/javascript" src="http://json-stat.org/lib/json-stat.js"></script>
+      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script type="text/javascript" src="http://code.highcharts.com/highcharts.js"></script>
+      <script src="http://code.highcharts.com/modules/data.js"></script>
+  </head>
+
+  <body>
+  <p>SSB API mot Statstikkbanken - ferdig datasett for UH<br />Eksempel på JSON-stat sammen med Highcharts <br />Bruk "Vis kilde"</p>
+  <!-- Highcharts container -->
+  <div id="container" style="width: 1200px; height: 800px; margin: 0 auto"></div>
+     
+    <script type="text/javascript">
+
+      /* Adresse til json-stat datasettet */
+    url="http://data.ssb.no/api/v0/dataset/58962.json";
+    /* henter datasettet med jquery get */
+    $.get(url, function main(obj){
+      ds=JSONstat(obj).Dataset(0);
+     
+      $(document).ready(function() {
+      /* Highcharts kode */     
+          $('#container').highcharts({
+
+              chart: {
+                  type: 'line'
+              },
+              
+              title: {
+                  text: 'UH-varer '  
+              },
+              /* henter dimensjoner i json-stat datasett. Tips: bruk F12 konsoll */
+              xAxis: [
+                  {
+                      categories: ds.Dimension("Tid").id
+                  }
+              ],
+
+              yAxis: [
+                  {
+                          title: {
+                          text: 'prosent'
+                      },
+                      opposite: true
+                  }, 
+                  {                   
+                          title: {
+                          text: 'Tusen'                       
+                      }
+                  }
+              ],
+
+              series:[
+              /* henter json-stat dataseriene */
+              {
+                  name: ds.Dimension("ContentsCode").Category("Itot").label,
+                  yAxis: 0,
+                  type: 'spline',
+                  data: ds.Data({"ContentsCode":"VerdiUjustert"}, false),
+                  zIndex: 2,
+              },
+              {
+                  name: ds.Dimension("ContentsCode").Category("Etot").label,
+                  yAxis: 1,
+                  type: 'spline',
+                  data: ds.Data({"ContentsCode":"VerdiUjustert"}, false),
+                  zIndex: 1,
+              },
+              {
+                  name: ds.Dimension("ContentsCode").Category("Hbtot").label,
+                  yAxis: 1,
+                  type: 'column',
+                  data: ds.Data({"ContentsCode":"VerdiUjustert"}, false),
+                  zIndex: 1,
+              }
+              ],
+              });
+          }
+      /* Slutt Highcharts kode */
+      );      
+      }
+    )
+ </script>
+      
+ 
+              
+  </body>
+</html>
